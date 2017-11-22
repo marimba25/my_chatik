@@ -110,7 +110,6 @@ class Client:
             # Добавляем в свою базу контактов
             self.repo.add_contact(username)
             try:
-                # FIXME: написать проверку на уникальность
                 self.repo.commit()
             except:
                 pass
