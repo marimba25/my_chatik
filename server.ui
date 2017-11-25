@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>498</width>
+    <height>409</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Wavy Parrot Server</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../../../../../../Downloads/icons8-parrot.png</normaloff>../../../../../../Downloads/icons8-parrot.png</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QTabWidget" name="tabWidgetClients">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>471</width>
+      <height>351</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>0</number>
+    </property>
+    <widget class="QWidget" name="tab">
+     <attribute name="title">
+      <string>Клиенты</string>
+     </attribute>
+     <widget class="QListWidget" name="listWidgetClients">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>441</width>
+        <height>301</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_2">
+     <attribute name="title">
+      <string>История соединений</string>
+     </attribute>
+     <widget class="QListWidget" name="listWidgetHistory">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>451</width>
+        <height>311</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>498</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuactions">
+    <property name="title">
+     <string>actions</string>
+    </property>
+    <addaction name="actionrefresh"/>
+   </widget>
+   <addaction name="menuactions"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionrefresh">
+   <property name="icon">
+    <iconset>
+     <normaloff>../../../../../../Downloads/if_sync_126579.ico</normaloff>../../../../../../Downloads/if_sync_126579.ico</iconset>
+   </property>
+   <property name="text">
+    <string>refresh</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

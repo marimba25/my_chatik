@@ -19,6 +19,9 @@ from jim.config import *
 from client_errors import WrongModeError
 from repo.client_repo import DbRepo
 from repo.client_models import Base
+import threading
+from queue import Queue
+from jim.errors import MandatoryKeyError
 
 # Получаем по имени клиентский логгер, он уже нестроен в log_config
 logger = logging.getLogger('client')
@@ -29,18 +32,18 @@ log = Log(logger)
 class Client:
     """Клиент"""
 
-    def __init__(self, name, addr='localhost', port=7777, mode='r'):
+    def __init__(self, name, addr='localhost', port=7777):
         """
         :param addr: адрес
         :param port: порт
-        :param mode: чтение или запись
         """
         self.name = name
         self.addr = addr
         self.port = port
-        self.mode = mode
         # Создаем клиенский репозиторий
         self.repo = DbRepo('{}.db'.format(self.name), Base)
+        # Создаем очередь для обработки ответов от сервера
+        self.request_queue = Queue()
 
     @log
     def connect(self):
@@ -78,21 +81,17 @@ class Client:
         list_message = JimMessage(action=GET_CONTACTS, time=time.time(), user=self.name)
         # отправляем
         self.socket.send(bytes(list_message))
-        # Принять не более 1024 байтов данных
-        message_bytes = self.socket.recv(1024)
-        # Формируем сообщение из байт
-        jm = JimResponse.create_from_bytes(message_bytes)
+        # дальше слушатель получит ответ, который мы получим из очереди
+        jm = self.request_queue.get()
         if jm.response == ACCEPTED:
-            # Ждем второе сообщение со списком контактов
-            message_bytes = self.socket.recv(1024)
-            jm = JimMessage.create_from_bytes(message_bytes)
-            # выводим список контактов
+            # получаем следующее сообщение из очереди, там должен быть список контактов
+            jm = self.request_queue.get()
             contact_list = jm.action
-            print(contact_list)
-            # обновляем наш список контактов, на сервере правильный
+            # обновим контакты в базе
             self.repo.clear_contacts()
             for contact in contact_list:
                 self.repo.add_contact(contact)
+            self.repo.commit()
             return contact_list
 
     def add_contact(self, username):
@@ -101,18 +100,12 @@ class Client:
         # отправляем сообщение на сервер
         self.socket.send(bytes(add_message))
         # получаем ответ от сервера
-        # Принять не более 1024 байтов данных
-        message_bytes = self.socket.recv(1024)
-        # Формируем сообщение из байт
-        jm = JimResponse.create_from_bytes(message_bytes)
+        # ответ получает слушатель, мы его получаем через очередь
+        jm = self.request_queue.get()
         if jm.response == OK:
-            print('Новый контакт {} успешно добавлен'.format(username))
             # Добавляем в свою базу контактов
             self.repo.add_contact(username)
-            try:
-                self.repo.commit()
-            except:
-                pass
+            self.repo.commit()
 
     def del_contact(self, username):
         # формируем сообщение на добавления контакта
@@ -120,10 +113,9 @@ class Client:
         # отправляем сообщение на сервер
         self.socket.send(bytes(message))
         # получаем ответ от сервера
-        # Принять не более 1024 байтов данных
-        message_bytes = self.socket.recv(1024)
+        # получаем ответ из очереди
         # Формируем сообщение из байт
-        jm = JimResponse.create_from_bytes(message_bytes)
+        jm = self.request_queue.get()
         if jm.response == OK:
             print('Контакт {} успешно удален'.format(username))
             # удаляем контакт из своей базы
@@ -135,99 +127,83 @@ class Client:
         message = JimMessage(**{ACTION: MSG, TO: to, FROM: self.name, MESSAGE: text, TIME: time.time()})
         # отправляем
         self.socket.send(bytes(message))
-        # получаем ответ
-        message_bytes = self.socket.recv(1024)
-        jm = JimResponse.create_from_bytes(message_bytes)
-        if jm.response == ACCEPTED:
-            print('Сообщение доставлено')
-        else:
-            print('Сообщение не доставлено')
-            print(jm.response)
-
-    def main_loop(self):
-        print('Сервер дал добро работаем')
-        if self.mode == 'r':
-            # читаем сообщения и выводим на экран
-            while True:
-                # Принять не более 1024 байтов данных
-                message_bytes = self.socket.recv(1024)
-                # Формируем сообщение из байт
-                jm = JimMessage.create_from_bytes(message_bytes)
-                # Выводим только текст сообщения
-                # print(jm.__dict__['from'])
-                print(jm.__dict__['from'])
-                print(jm.message)
-        elif self.mode == 'w':
-            # ждем ввода сообщения и шлем на сервер
-            while True:
-                # Тут будем добавлять контакты и получать список контактов
-                message_str = input(':) >')
-                if message_str.startswith('add'):
-                    # добавляем контакт
-                    # получаем имя пользователя
-                    try:
-                        username = message_str.split()[1]
-                    except IndexError:
-                        print('Не указано имя пользователя')
-                    else:
-                        self.add_contact(username)
-                elif message_str.startswith('del'):
-                    # удаляем контакт
-                    # получаем имя пользователя
-                    try:
-                        username = message_str.split()[1]
-                    except IndexError:
-                        print('Не указано имя пользователя')
-                    else:
-                        self.del_contact(username)
-                elif message_str == 'list':
-                    self.get_contacts()
-                elif message_str.startswith('message'):
-                    params = message_str.split()
-                    try:
-                        to = params[1]
-                        text = params[2]
-                    except IndexError:
-                        print('Не задан получатель или текст сообщения')
-                    else:
-                        self.send_message(to, text)
-                elif message_str == 'help':
-                    print('add <имя пользователя> - добавить контакт')
-                    print('del <имя пользователя> - удалить контакт')
-                    print('list - список контактов')
-                else:
-                    print('Неверная команда, для справки введите help')
-        else:
-            raise WrongModeError(mode)
 
 
-if __name__ == '__main__':
+
+
+    #def send_message(self, to, text):
+        # формируем сообщение
+        #message = JimMessage(**{ACTION: MSG, TO: to, FROM: self.name, MESSAGE: text, TIME: time.time()})
+        # отправляем
+       #self.socket.send(bytes(message))
+
+    #def main_loop(self):
+        #listener = Receiver(self.socket, self.request_queue)
+        #th_listen = threading.Thread(target=listener)
+        #th_listen.daemon = True
+        #th_listen.start()
+        # ждем ввода сообщения и шлем на сервер
+        #while True:
+            # Тут будем добавлять контакты и получать список контактов
+            #message_str = input(':) >')
+            #if message_str.startswith('add'):
+                # добавляем контакт
+                # получаем имя пользователя
+                #try:
+                    #username = message_str.split()[1]
+                    #print(username)
+                #except IndexError:
+                    #print('Не указано имя пользователя')
+                #else:
+                    #self.add_contact(username)
+            #elif message_str.startswith('del'):
+                # удаляем контакт
+                # получаем имя пользователя
+                #try:
+                    #username = message_str.split()[1]
+                #except IndexError:
+                    #print('Не указано имя пользователя')
+                #else:
+                    #self.del_contact(username)
+            #elif message_str == 'list':
+                #self.get_contacts()
+            #elif message_str.startswith('message'):
+                #params = message_str.split()
+                #try:
+                    #to = params[1]
+                    #text = params[2]
+                #except  IndexError:
+                    #print('Не задан отправитель или текст сообщения')
+                #else:
+                    #self.send_message(to, text)
+            #elif message_str == 'help':
+                #print('add <имя пользователя> - добавить контакт')
+                #print('del <имя пользователя> - удалить контакт')
+                #print('list - список контактов')
+            #else:
+                #print('Неверная команда, для справки введите help')
+
+
+#if __name__ == '__main__':
     # Получаем параметры скрипта
-    try:
-        addr = sys.argv[1]
-    except IndexError:
-        addr = 'localhost'
-    try:
-        port = int(sys.argv[2])
-    except IndexError:
-        port = 7777
-    except ValueError:
-        print('Порт должен быть целым числом')
-        sys.exit(0)
-    try:
-        mode = sys.argv[3]
-        if mode not in ('r', 'w'):
-            print('Режим должен быть r - чтение, w - запись')
-            sys.exit(0)
-    except IndexError:
-        mode = 'w'
-    try:
-        name = sys.argv[4]
-        print(name)
-    except IndexError:
-        name = 'Guest'
+    #try:
+        #addr = sys.argv[1]
+    #except IndexError:
+        #addr = 'localhost'
+    #try:
+        #port = int(sys.argv[2])
+    #except IndexError:
+        #port = 7777
+    #except ValueError:
+        #print('Порт должен быть целым числом')
+        #sys.exit(0)
+    #try:
+        #name = sys.argv[3]
+        #print(name)
+    #except IndexError:
+        #name = 'Guest'
 
-    client = Client(name, addr, port, mode)
-    client.connect()
-    client.main_loop()
-    client.disconnect()
+    #client = Client(name, addr, port)
+    #client.connect()
+    #client.main_loop()
+    #client.disconnect()
