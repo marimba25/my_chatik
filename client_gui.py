@@ -4,6 +4,7 @@ import threading
 from PyQt5.QtCore import Qt, QThread, pyqtSlot
 from client import Client
 from handlers import GuiReciever
+from PyQt5.QtWidgets import QMessageBox
 
 
 name = 'Marina'
@@ -99,9 +100,13 @@ def del_contact():
 # связываем сигнал нажатия на кнопку и слот функцию удаления контакта
 window.pushButtonDelContact.clicked.connect(del_contact)
 
-# TODO to code the help-show
-#def show_help():
-   # """Показывает всплывающее окно с подсказками"""
+
+def show_help():
+    """Показывает всплывающее окно с подсказками"""
+    QMessageBox.information(window, "What to do", "Add contact: add  <user name>,\nDelete contact: del  <user name>")
+
+
+window.pushButtonHelp.clicked.connect(show_help)
 
 
 def open_chat():
