@@ -113,7 +113,7 @@ def open_chat():
     try:
         """Открытие модального чата (модальное для демонстрации)"""
         # грузим QDialog чата
-        dialog = uic.loadUi('chat.ui')
+        dialog = uic.loadUi('chat_maia.ui')
 
         # получаем выделенного пользователя
         selected_index = window.listWidgetContacts.currentIndex()
@@ -124,7 +124,7 @@ def open_chat():
 
         # отправка сообщения
         def send_message():
-            text = dialog.textEditMessage.toPlainText()
+            text = dialog.textEdit.toPlainText()
             if text:
                 client.send_message(user_name, text)
                 # будем выводить то что мы отправили в общем чате
@@ -132,11 +132,11 @@ def open_chat():
                 window.listWidgetMessages.addItem(msg)
 
         # связываем отправку с кнопкой ОК
-        dialog.pushOk.clicked.connect(send_message)
+        dialog.Send.clicked.connect(send_message)
         # запускаем в модальном режиме
         # привязываем события модального окна (для демонстрации)
-        dialog.pushOk.clicked.connect(dialog.accept)
-        dialog.pushCancel.clicked.connect(dialog.reject)
+        dialog.Send.clicked.connect(dialog.accept)
+        dialog.Dont.clicked.connect(dialog.reject)
         dialog.exec()
     except Exception as e:
         print(e)
