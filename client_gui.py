@@ -6,8 +6,8 @@ from client import Client
 from handlers import GuiReciever
 from PyQt5.QtWidgets import QMessageBox
 
-
-name = 'Marina'
+#я
+name = input("What is your name?")
 # Создаем приложение
 app = QtWidgets.QApplication(sys.argv)
 # грузим главную форму

@@ -15,11 +15,10 @@ except IndexError:
 except ValueError:
     print('Порт должен быть целым числом')
     sys.exit(0)
-try:
-    name = sys.argv[3]
-    print(name)
-except IndexError:
-    name = 'Guest'
+
+name = input("What is your name?") or 'Guest'
+print(name)
+
 
 client = Client(name, addr, port)
 client.connect()

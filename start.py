@@ -2,6 +2,7 @@
 
 from subprocess import Popen
 import time
+from client import Client
 import random
 
 # список запущенных процессов
@@ -23,13 +24,11 @@ while True:
         # ждем на всякий пожарный
         time.sleep(1)
         # запускаем консольных клиентов
-        CONSOLE_COUNT = 2
+        CONSOLE_COUNT = 5
         for i in range(CONSOLE_COUNT):
             # Запускаем клиентский скрипт и добавляем его в список процессов
             print('Запуск консольного клиента')
-            client_name = 'Console{}'.format(i)
-            print(client_name)
-            p_list.append(Popen(['xterm', '-hold', '-e', 'python3 {} localhost 7777 {}'.format(CLIENT_PATH, client_name)],
+            p_list.append(Popen(['xterm', '-hold', '-e', 'python3 {} localhost 7777'.format(CLIENT_PATH)],
                                  shell=False))
 
         # запускаем гуи клиентов
@@ -42,7 +41,7 @@ while True:
             p_list.append(
                 Popen(['xterm', '-hold', '-e', 'python3 {}'.format(CLIENT_GUI_PATH)],
                       shell=False))
-        print('Клиенты звпущены')
+        print('Клиенты запущены')
 
     elif user == 'q':
         print('Открыто процессов {}'.format(len(p_list)))

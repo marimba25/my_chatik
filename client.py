@@ -29,6 +29,7 @@ logger = logging.getLogger('client')
 log = Log(logger)
 
 
+# тот клиент, с которым я общаюсь
 class Client:
     """Клиент"""
 
