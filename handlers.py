@@ -62,7 +62,7 @@ class GuiReciever(Receiver, QObject):
         QObject.__init__(self)
 
     def process_message(self, message):
-        self.gotData.emit('{} >>> {}'.format(message.__dict__['from'], message.message))
+        self.gotData.emit('{} >>> {}: {}'.format(message.__dict__['from'], message.__dict__['to'],  message.message))
 
     def poll(self):
         super().poll()

@@ -130,7 +130,7 @@ def open_chat():
             if text:
                 client.send_message(user_name, text)
                 # будем выводить то что мы отправили в общем чате
-                msg = '{} >>> {}'.format(name, text)
+                msg = '{} >>> {}: {}'.format(name, user_name, text)
                 window.listWidgetMessages.addItem(msg)
 
         # связываем отправку с кнопкой ОК

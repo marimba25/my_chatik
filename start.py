@@ -24,7 +24,7 @@ while True:
         # ждем на всякий пожарный
         time.sleep(1)
         # запускаем консольных клиентов
-        CONSOLE_COUNT = 5
+        CONSOLE_COUNT = 0
         for i in range(CONSOLE_COUNT):
             # Запускаем клиентский скрипт и добавляем его в список процессов
             print('Запуск консольного клиента')
@@ -32,12 +32,12 @@ while True:
                                  shell=False))
 
         # запускаем гуи клиентов
-        GUI_COUNT = 1
+        GUI_COUNT = 3
         for i in range(GUI_COUNT):
             # запускаем клиентский скрипт и добавляем его в список процессов
             print("Запуск гуи клиента")
-            client_name = 'Gui{}'.format(i)
-            print(client_name)
+
+            client_name = 'Guest{}'.format(i)
             p_list.append(
                 Popen(['xterm', '-hold', '-e', 'python3 {}'.format(CLIENT_GUI_PATH)],
                       shell=False))
