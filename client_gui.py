@@ -4,7 +4,8 @@ import threading
 from PyQt5.QtCore import Qt, QThread, pyqtSlot
 from client import Client
 from handlers import GuiReciever
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QMessageBox, QAction
+from PyQt5.QtGui import QIcon
 
 #я
 name = input("What is your name?")
@@ -124,6 +125,36 @@ def open_chat():
         # выставляем имя в название окна
         dialog.setWindowTitle(user_name)
 
+        bold = QAction(QIcon('b.jpg'), 'Bold', text)
+        italic = QAction(QIcon('i.jpg'), 'Italic', text)
+        underlined = QAction(QIcon('u.jpg'), 'Underlined', text)
+        toolbar = self.addToolBar('Formatting')
+        toolbar.addAction(bold)
+        toolbar.addAction(italic)
+        toolbar.addAction(underlined)
+
+        bold.triggered.connect(self.actionBold)
+        italic.triggered.connect(self.actionItalic)
+        underlined.triggered.connect(self.actionUnderlined)
+
+        def actionBold(self):
+            myFont = QFont()
+
+            myFont.setBold(True)
+            self.textEdit.setFont(myFont)
+
+        def actionItalic(self):
+            myFont = QFont()
+
+            myFont.setItalic(True)
+            self.textEdit.setFont(myFont)
+
+        def actionUnderlined(self):
+            myFont = QFont()
+
+            myFont.setUnderline(True)
+            self.textEdit.setFont(myFont)
+
         # отправка сообщения
         def send_message():
             text = dialog.textEdit.toPlainText()
@@ -132,6 +163,8 @@ def open_chat():
                 # будем выводить то что мы отправили в общем чате
                 msg = '{} >>> {}: {}'.format(name, user_name, text)
                 window.listWidgetMessages.addItem(msg)
+
+
 
         # связываем отправку с кнопкой ОК
         dialog.Send.clicked.connect(send_message)
