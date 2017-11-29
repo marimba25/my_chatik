@@ -6,9 +6,27 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>849</width>
-    <height>578</height>
+    <width>323</width>
+    <height>320</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>320</width>
+    <height>320</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>780</width>
+    <height>540</height>
+   </size>
+  </property>
+  <property name="baseSize">
+   <size>
+    <width>618</width>
+    <height>445</height>
+   </size>
   </property>
   <property name="palette">
    <palette>
@@ -437,7 +455,11 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QTextEdit" name="textEdit"/>
+        <widget class="QTextEdit" name="textEdit">
+         <property name="readOnly">
+          <bool>false</bool>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QPushButton" name="Send">
@@ -463,7 +485,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>849</width>
+     <width>323</width>
      <height>22</height>
     </rect>
    </property>

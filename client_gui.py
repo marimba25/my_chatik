@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt, QThread, pyqtSlot
 from client import Client
 from handlers import GuiReciever
 from PyQt5.QtWidgets import QMessageBox, QAction, QTextEdit
-from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtGui import QIcon, QFont, QTextCharFormat
 
 #я
 name = input("What is your name?")
@@ -126,19 +126,19 @@ def open_chat():
         chatik.setWindowTitle(user_name)
 
         def action_bold():
-            my_font = QFont()
-            my_font.setBold(True)
-            chatik.textEdit.setFont(my_font)
+            my_font = QTextCharFormat()
+            my_font.setFontWeight(QFont.Bold)
+            chatik.textEdit.setCurrentCharFormat(my_font)
 
         def action_italic():
-            my_font = QFont()
-            my_font.setItalic(True)
-            chatik.textEdit.setFont(my_font)
+            my_font = QTextCharFormat()
+            my_font.setFontItalic(True)
+            chatik.textEdit.setCurrentCharFormat(my_font)
 
         def action_underlined():
-            my_font = QFont()
-            my_font.setUnderline(True)
-            chatik.textEdit.setFont(my_font)
+            my_font = QTextCharFormat()
+            my_font.setFontUnderline(True)
+            chatik.textEdit.setCurrentCharFormat(my_font)
 
         bold = QAction(QIcon('icons/b.jpg'), 'Bold', chatik)
         italic = QAction(QIcon('icons/i.jpg'), 'Italic', chatik)
@@ -153,6 +153,31 @@ def open_chat():
         italic.triggered.connect(action_italic)
         underlined.triggered.connect(action_underlined)
 
+        def action_smile():
+            url = 'icons/smile.png'
+            chatik.textEdit.insertHtml('<img src="%s" />' % url)
+
+        def action_sad():
+            url = 'icons/sad.png'
+            chatik.textEdit.insertHtml('<img src="%s" />' % url)
+
+        def action_scared():
+            url = 'icons/scared.png'
+            chatik.textEdit.insertHtml('<img src="%s" />' % url)
+
+        smile = QAction(QIcon('icons/smile.png'), 'Smile', chatik)
+        sad = QAction(QIcon('icons/sad.png'), 'Sad', chatik)
+        scared = QAction(QIcon('icons/scared'), 'Scared', chatik)
+
+        toolbar = chatik.addToolBar('Smiles')
+        toolbar.addAction(smile)
+        toolbar.addAction(sad)
+        toolbar.addAction(scared)
+
+        smile.triggered.connect(action_smile)
+        sad.triggered.connect(action_sad)
+        scared.triggered.connect(action_scared)
+
         # отправка сообщения
         def send_message():
             text = chatik.textEdit.toHtml()
@@ -160,7 +185,7 @@ def open_chat():
                 client.send_message(user_name, text)
                 # будем выводить то что мы отправили в общем чате
                 msg = '{} >>> {}: {}'.format(name, user_name, text)
-                window.textEditMessage.addItem(msg)
+                window.textEditMessage.insertHtml(msg + '<br>')
 
 
         # связываем отправку с кнопкой ОК
