@@ -30,7 +30,7 @@ def update_chat(data):
     '''
     try:
         msg = data
-        window.listWidgetMessages.addItem(msg)
+        window.textEditMessage.insertHtml(msg + "<br>")
     except Exception as e:
         print(e)
 
@@ -155,12 +155,12 @@ def open_chat():
 
         # отправка сообщения
         def send_message():
-            text = chatik.textEdit.toPlainText()
+            text = chatik.textEdit.toHtml()
             if text:
                 client.send_message(user_name, text)
                 # будем выводить то что мы отправили в общем чате
                 msg = '{} >>> {}: {}'.format(name, user_name, text)
-                window.listWidgetMessages.addItem(msg)
+                window.textEditMessage.addItem(msg)
 
 
         # связываем отправку с кнопкой ОК
