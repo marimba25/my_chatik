@@ -4,8 +4,8 @@ import threading
 from PyQt5.QtCore import Qt, QThread, pyqtSlot
 from client import Client
 from handlers import GuiReciever
-from PyQt5.QtWidgets import QMessageBox, QAction
-from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QMessageBox, QAction, QTextEdit
+from PyQt5.QtGui import QIcon, QFont
 
 #я
 name = input("What is your name?")
@@ -116,48 +116,46 @@ def open_chat():
     try:
         """Открытие модального чата (модальное для демонстрации)"""
         # грузим QDialog чата
-        dialog = uic.loadUi('chat_maia.ui')
+        chatik = uic.loadUi('chatik_window.ui')
 
         # получаем выделенного пользователя
         selected_index = window.listWidgetContacts.currentIndex()
         # получаем имя пользователя
         user_name = selected_index.data()
         # выставляем имя в название окна
-        dialog.setWindowTitle(user_name)
+        chatik.setWindowTitle(user_name)
 
-        bold = QAction(QIcon('b.jpg'), 'Bold', text)
-        italic = QAction(QIcon('i.jpg'), 'Italic', text)
-        underlined = QAction(QIcon('u.jpg'), 'Underlined', text)
-        toolbar = self.addToolBar('Formatting')
+        def action_bold():
+            my_font = QFont()
+            my_font.setBold(True)
+            chatik.textEdit.setFont(my_font)
+
+        def action_italic():
+            my_font = QFont()
+            my_font.setItalic(True)
+            chatik.textEdit.setFont(my_font)
+
+        def action_underlined():
+            my_font = QFont()
+            my_font.setUnderline(True)
+            chatik.textEdit.setFont(my_font)
+
+        bold = QAction(QIcon('b.jpg'), 'Bold', chatik)
+        italic = QAction(QIcon('i.jpg'), 'Italic', chatik)
+        underlined = QAction(QIcon('u.jpg'), 'Underlined', chatik)
+
+        toolbar = chatik.addToolBar('Formatting')
         toolbar.addAction(bold)
         toolbar.addAction(italic)
         toolbar.addAction(underlined)
 
-        bold.triggered.connect(self.actionBold)
-        italic.triggered.connect(self.actionItalic)
-        underlined.triggered.connect(self.actionUnderlined)
-
-        def actionBold(self):
-            myFont = QFont()
-
-            myFont.setBold(True)
-            self.textEdit.setFont(myFont)
-
-        def actionItalic(self):
-            myFont = QFont()
-
-            myFont.setItalic(True)
-            self.textEdit.setFont(myFont)
-
-        def actionUnderlined(self):
-            myFont = QFont()
-
-            myFont.setUnderline(True)
-            self.textEdit.setFont(myFont)
+        bold.triggered.connect(action_bold)
+        italic.triggered.connect(action_italic)
+        underlined.triggered.connect(action_underlined)
 
         # отправка сообщения
         def send_message():
-            text = dialog.textEdit.toPlainText()
+            text = chatik.textEdit.toPlainText()
             if text:
                 client.send_message(user_name, text)
                 # будем выводить то что мы отправили в общем чате
@@ -165,14 +163,13 @@ def open_chat():
                 window.listWidgetMessages.addItem(msg)
 
 
-
         # связываем отправку с кнопкой ОК
-        dialog.Send.clicked.connect(send_message)
+        chatik.Send.clicked.connect(send_message)
         # запускаем в модальном режиме
         # привязываем события модального окна (для демонстрации)
-        dialog.Send.clicked.connect(dialog.accept)
-        dialog.Dont.clicked.connect(dialog.reject)
-        dialog.exec()
+        chatik.Send.clicked.connect(chatik.close)
+        chatik.Dont.clicked.connect(chatik.close)
+        chatik.show()
     except Exception as e:
         print(e)
 # Пока мы не можем передать элемент на который нажали - сделать в следующий раз через наследование
