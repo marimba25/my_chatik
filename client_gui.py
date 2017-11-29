@@ -140,9 +140,9 @@ def open_chat():
             my_font.setUnderline(True)
             chatik.textEdit.setFont(my_font)
 
-        bold = QAction(QIcon('b.jpg'), 'Bold', chatik)
-        italic = QAction(QIcon('i.jpg'), 'Italic', chatik)
-        underlined = QAction(QIcon('u.jpg'), 'Underlined', chatik)
+        bold = QAction(QIcon('icons/b.jpg'), 'Bold', chatik)
+        italic = QAction(QIcon('icons/i.jpg'), 'Italic', chatik)
+        underlined = QAction(QIcon('icons/u.jpg'), 'Underlined', chatik)
 
         toolbar = chatik.addToolBar('Formatting')
         toolbar.addAction(bold)
