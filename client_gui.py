@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt, QThread, pyqtSlot
 from client import Client
 from handlers import GuiReciever
 from PyQt5.QtWidgets import QMessageBox, QAction, QTextEdit
-from PyQt5.QtGui import QIcon, QFont, QTextCharFormat
+from PyQt5.QtGui import QIcon, QFont, QTextCharFormat, QImage, QPixmap
 
 #я
 name = input("What is your name?")
@@ -20,10 +20,13 @@ client = Client(name=name)
 client.connect()
 
 listener = GuiReciever(client.socket, client.request_queue)
+
+image = QImage("icons/cat1.jpg")
+pixmap = QPixmap.fromImage(image)
+window.avatar.setPixmap(pixmap)
+
 # Связываем сигнал и слот
 # слот обновление данных в списке сообщений
-
-
 @pyqtSlot(str)
 def update_chat(data):
     ''' Отображение сообщения в истории
