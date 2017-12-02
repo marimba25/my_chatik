@@ -21,17 +21,6 @@ client.connect()
 
 listener = GuiReciever(client.socket, client.request_queue)
 
-image_path = QFileDialog.getOpenFileName(window, 'Choose file', '', 'Images (*.jpg)')
-print("выбран файл")
-print(image_path)
-
-
-image = QImage(image_path[0])
-pixmap = QPixmap.fromImage(image)
-window.avatar.setPixmap(pixmap)
-
-
-# TODO связать аватар с пользователем
 
 
 # Связываем сигнал и слот
@@ -122,6 +111,18 @@ def show_help():
 
 
 window.pushButtonHelp.clicked.connect(show_help)
+
+
+def set_avatar():
+    image_path = QFileDialog.getOpenFileName(window, 'Choose file', '', 'Images (*.jpg)')
+    print("выбран файл")
+    print(image_path)
+    image = QImage(image_path[0])
+    pixmap = QPixmap.fromImage(image)
+    window.avatar.setPixmap(pixmap)
+
+
+window.pushButtonChangeAvatar.clicked.connect(set_avatar)
 
 
 def open_chat():

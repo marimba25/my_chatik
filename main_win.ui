@@ -507,8 +507,27 @@
             <property name="frameShape">
              <enum>QFrame::Box</enum>
             </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <property name="lineWidth">
+             <number>0</number>
+            </property>
             <property name="text">
              <string/>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="pushButtonChangeAvatar">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>30</y>
+              <width>161</width>
+              <height>25</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Change avatar</string>
             </property>
            </widget>
           </widget>
