@@ -4,7 +4,7 @@ import threading
 from PyQt5.QtCore import Qt, QThread, pyqtSlot
 from client import Client
 from handlers import GuiReciever
-from PyQt5.QtWidgets import QMessageBox, QAction, QTextEdit
+from PyQt5.QtWidgets import QMessageBox, QAction, QTextEdit, QFileDialog
 from PyQt5.QtGui import QIcon, QFont, QTextCharFormat, QImage, QPixmap
 
 #я
@@ -21,9 +21,18 @@ client.connect()
 
 listener = GuiReciever(client.socket, client.request_queue)
 
-image = QImage("icons/cat1.jpg")
+image_path = QFileDialog.getOpenFileName(window, 'Choose file', '', 'Images (*.jpg)')
+print("выбран файл")
+print(image_path)
+
+
+image = QImage(image_path[0])
 pixmap = QPixmap.fromImage(image)
 window.avatar.setPixmap(pixmap)
+
+
+# TODO связать аватар с пользователем
+
 
 # Связываем сигнал и слот
 # слот обновление данных в списке сообщений

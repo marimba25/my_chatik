@@ -26,6 +26,18 @@ class Contact(Base):
         return self.Name == other.Name
 
 
+class Image(Base):
+    """Image"""
+    # table name
+    __tablename__ = 'Image'
+    # primary key
+    ImageID = Column(Integer, primary_key=True)
+    Image_name = "avatar ".format(Contact.Name)
+
+    def __init__(self, image):
+        self.image = image
+
+
 class Message(Base):
     """Сообщение"""
     # имя таблицы

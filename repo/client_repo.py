@@ -40,6 +40,11 @@ class DbRepo(DbBaseRepo):
         else:
             raise NoneContactError(username)
 
+    def add_image(self, image):
+        """Add image"""
+
+
+
     def clear_contacts(self):
         # Удаление всех контактов
         self.session.query(Contact).delete()
