@@ -153,17 +153,17 @@ def open_chat():
         def action_bold():
             my_font = QTextCharFormat()
             my_font.setFontWeight(QFont.Bold)
-            chatik.textEdit.setCurrentCharFormat(my_font)
+            chatik.textEdit.mergeCurrentCharFormat(my_font)
 
         def action_italic():
             my_font = QTextCharFormat()
             my_font.setFontItalic(True)
-            chatik.textEdit.setCurrentCharFormat(my_font)
+            chatik.textEdit.mergeCurrentCharFormat(my_font)
 
         def action_underlined():
             my_font = QTextCharFormat()
             my_font.setFontUnderline(True)
-            chatik.textEdit.setCurrentCharFormat(my_font)
+            chatik.textEdit.mergeCurrentCharFormat(my_font)
 
         bold = QAction(QIcon('icons/b.jpg'), 'Bold', chatik)
         italic = QAction(QIcon('icons/i.jpg'), 'Italic', chatik)
