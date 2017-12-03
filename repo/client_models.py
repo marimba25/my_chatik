@@ -1,5 +1,5 @@
 import datetime
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Binary
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -26,16 +26,30 @@ class Contact(Base):
         return self.Name == other.Name
 
 
-class Image(Base):
-    """Image"""
-    # table name
-    __tablename__ = 'Image'
-    # primary key
-    ImageID = Column(Integer, primary_key=True)
-    Image_name = "avatar ".format(Contact.Name)
+# class Avatar(Base):
+#     """Avatar"""
+#     # table name
+#     __tablename__ = 'Avatar'
+#     # primary key
+#     ID = Column(Integer, primary_key=True)
+#     ContactId = Column(Integer, ForeignKey('Contact.ContactId'))
+#     Avatar = Column(Binary)
+#
+#     def __init__(self, contact_id, avatar_data):
+#         self.ContactId = contact_id
+#         self.Avatar = avatar_data
+#
 
-    def __init__(self, image):
-        self.image = image
+class MyAvatar(Base):
+    """Avatar"""
+    # table name
+    __tablename__ = 'MyAvatar'
+    # primary key
+    ID = Column(Integer, primary_key=True)
+    Avatar = Column(Binary)
+
+    def __init__(self, avatar_data):
+        self.Avatar = avatar_data
 
 
 class Message(Base):

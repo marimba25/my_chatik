@@ -1,4 +1,4 @@
-from .client_models import Contact, Message
+from .client_models import Contact, Message, MyAvatar
 from .client_errors import NoneContactError
 from .repo import DbBaseRepo
 
@@ -40,10 +40,18 @@ class DbRepo(DbBaseRepo):
         else:
             raise NoneContactError(username)
 
-    def add_image(self, image):
-        """Add image"""
+    def add_my_avatar(self, avatar_data):
+        new_item = MyAvatar(avatar_data=avatar_data)
+        self.session.add(new_item)
 
-
+    # def add_user_avatar(self, username, avatar_data):
+    #     """Add avatar"""
+    #     contact = self._get_contact_by_username(username)
+    #     if contact:
+    #         new_item = Avatar(contact_id=contact.ContactId, avatar_data=avatar_data)
+    #         self.session.add(new_item)
+    #     else:
+    #         raise NoneContactError(username)
 
     def clear_contacts(self):
         # Удаление всех контактов
