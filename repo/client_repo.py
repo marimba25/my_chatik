@@ -44,6 +44,13 @@ class DbRepo(DbBaseRepo):
         new_item = MyAvatar(avatar_data=avatar_data)
         self.session.add(new_item)
 
+    def get_my_avatar(self):
+        avatar = self.session.query(MyAvatar).order_by(MyAvatar.ID.desc()).first()
+        try:
+            return avatar.Avatar
+        except:
+            return None
+
     # def add_user_avatar(self, username, avatar_data):
     #     """Add avatar"""
     #     contact = self._get_contact_by_username(username)

@@ -7,7 +7,7 @@ from handlers import GuiReciever
 from PyQt5.QtWidgets import QMessageBox, QAction, QTextEdit, QFileDialog
 from PyQt5.QtGui import QIcon, QFont, QTextCharFormat, QImage, QPixmap
 
-#я
+# я
 name = input("What is your name?")
 # Создаем приложение
 app = QtWidgets.QApplication(sys.argv)
@@ -20,7 +20,6 @@ client = Client(name=name)
 client.connect()
 
 listener = GuiReciever(client.socket, client.request_queue)
-
 
 
 # Связываем сигнал и слот
@@ -39,11 +38,10 @@ def update_chat(data):
 # сигнал мы берем из нашего GuiReciever
 listener.gotData.connect(update_chat)
 
-
 # Используем QThread так рекомендуется, но можно и обычный
-#th_listen = threading.Thread(target=listener.poll)
-#th_listen.daemon = True
-#th_listen.start()
+# th_listen = threading.Thread(target=listener.poll)
+# th_listen.daemon = True
+# th_listen.start()
 th = QThread()
 listener.moveToThread(th)
 
@@ -82,6 +80,7 @@ def add_contact():
 # Связываем сигнал нажатия кнопки добавить со слотом функцией добавить контакт
 window.pushButtonAddContact.clicked.connect(add_contact)
 
+
 # TODO в поле для ввода пользователя добавить подсказку ("...введите имя пользователя...")
 
 
@@ -113,21 +112,34 @@ def show_help():
 window.pushButtonHelp.clicked.connect(show_help)
 
 
-def set_avatar():
-    image_path = QFileDialog.getOpenFileName(window, 'Choose file', '', 'Images (*.jpg)')
-    print("выбран файл")
-    print(image_path)
-    image = QImage(image_path[0])
+def draw_avatar(image):
     pixmap = QPixmap.fromImage(image)
     window.avatar.setPixmap(pixmap)
+
+
+def set_avatar():
+    """установка аватарки"""
+    image_path = QFileDialog.getOpenFileName(window, 'Choose file', '', 'Images (*.jpg)')[0]
+    client.add_my_avatar(image_path)
+    image = QImage(image_path)
+    draw_avatar(image)
 
 
 window.pushButtonChangeAvatar.clicked.connect(set_avatar)
 
 
+def get_my_avatar():
+    gettin_avatar = client.get_my_avatar()
+    if not gettin_avatar:
+        return
+    image = QImage()
+    image.loadFromData(gettin_avatar)
+    draw_avatar(image)
+
+
 def open_chat():
     try:
-        """Открытие модального чата (модальное для демонстрации)"""
+        """Открытие чата"""
         # грузим QDialog чата
         chatik = uic.loadUi('chatik_window.ui')
 
@@ -200,7 +212,6 @@ def open_chat():
                 msg = '{} >>> {}: {}'.format(name, user_name, text)
                 window.textEditMessage.insertHtml(msg + '<br>')
 
-
         # связываем отправку с кнопкой ОК
         chatik.Send.clicked.connect(send_message)
         # запускаем в модальном режиме
@@ -210,11 +221,12 @@ def open_chat():
         chatik.show()
     except Exception as e:
         print(e)
+
+
 # Пока мы не можем передать элемент на который нажали - сделать в следующий раз через наследование
 
 
 window.listWidgetContacts.itemDoubleClicked.connect(open_chat)
-
 
 # Контекстное меню при нажатии правой кнопки мыши (пока тестовый вариант для демонстрации)
 # Создаем на листе
@@ -223,6 +235,7 @@ window.listWidgetContacts.setContextMenuPolicy(Qt.ActionsContextMenu)
 quitAction = QtWidgets.QAction("Quit", None)
 quitAction.triggered.connect(app.quit)
 window.listWidgetContacts.addAction(quitAction)
+get_my_avatar()
 
 # рисуем окно
 window.show()

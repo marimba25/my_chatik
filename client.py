@@ -129,82 +129,12 @@ class Client:
         # отправляем
         self.socket.send(bytes(message))
 
+    def add_my_avatar(self, image_path):
+        with open(image_path, 'rb') as f:
+            avatar_data = f.read()
+            self.repo.add_my_avatar(avatar_data=avatar_data)
+            self.repo.commit()
 
+    def get_my_avatar(self):
+        return self.repo.get_my_avatar()
 
-
-    #def send_message(self, to, text):
-        # формируем сообщение
-        #message = JimMessage(**{ACTION: MSG, TO: to, FROM: self.name, MESSAGE: text, TIME: time.time()})
-        # отправляем
-       #self.socket.send(bytes(message))
-
-    #def main_loop(self):
-        #listener = Receiver(self.socket, self.request_queue)
-        #th_listen = threading.Thread(target=listener)
-        #th_listen.daemon = True
-        #th_listen.start()
-        # ждем ввода сообщения и шлем на сервер
-        #while True:
-            # Тут будем добавлять контакты и получать список контактов
-            #message_str = input(':) >')
-            #if message_str.startswith('add'):
-                # добавляем контакт
-                # получаем имя пользователя
-                #try:
-                    #username = message_str.split()[1]
-                    #print(username)
-                #except IndexError:
-                    #print('Не указано имя пользователя')
-                #else:
-                    #self.add_contact(username)
-            #elif message_str.startswith('del'):
-                # удаляем контакт
-                # получаем имя пользователя
-                #try:
-                    #username = message_str.split()[1]
-                #except IndexError:
-                    #print('Не указано имя пользователя')
-                #else:
-                    #self.del_contact(username)
-            #elif message_str == 'list':
-                #self.get_contacts()
-            #elif message_str.startswith('message'):
-                #params = message_str.split()
-                #try:
-                    #to = params[1]
-                    #text = params[2]
-                #except  IndexError:
-                    #print('Не задан отправитель или текст сообщения')
-                #else:
-                    #self.send_message(to, text)
-            #elif message_str == 'help':
-                #print('add <имя пользователя> - добавить контакт')
-                #print('del <имя пользователя> - удалить контакт')
-                #print('list - список контактов')
-            #else:
-                #print('Неверная команда, для справки введите help')
-
-
-#if __name__ == '__main__':
-    # Получаем параметры скрипта
-    #try:
-        #addr = sys.argv[1]
-    #except IndexError:
-        #addr = 'localhost'
-    #try:
-        #port = int(sys.argv[2])
-    #except IndexError:
-        #port = 7777
-    #except ValueError:
-        #print('Порт должен быть целым числом')
-        #sys.exit(0)
-    #try:
-        #name = sys.argv[3]
-        #print(name)
-    #except IndexError:
-        #name = 'Guest'
-
-    #client = Client(name, addr, port)
-    #client.connect()
-    #client.main_loop()
-    #client.disconnect()
