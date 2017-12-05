@@ -1,3 +1,4 @@
+import base64
 import json
 from .config import *
 from .errors import MandatoryKeyError, ResponseCodeError, ResponseCodeLenError
@@ -20,7 +21,6 @@ class BaseJimMessage:
         message_json = json.dumps(self.__dict__)
         # Преобразуем в байты
         message_bytes = message_json.encode(encoding='utf-8')
-        print('messbytes', message_bytes)
         # Возвращаем рузльтат
         return message_bytes
 
@@ -28,13 +28,19 @@ class BaseJimMessage:
     def create_from_bytes(cls, message_bytes):
         """Возможность создавать сообщение по набору байт"""
         # Байты в json
-        print('bytes', message_bytes)
         message_json = message_bytes.decode(encoding='utf-8')
         # json в словарь
-        print('json', message_json)
         message_dict = json.loads(message_json)
         # создаем экземпляр нужного класса
         return cls(**message_dict)
+
+    @staticmethod
+    def bytes_to_base64str(bytes_input):
+        return base64.encodebytes(bytes_input).decode('utf-8')
+
+    @staticmethod
+    def base64str_to_bytes(str_input):
+        return base64.decodebytes(str_input.encode('utf-8'))
 
     def __str__(self):
         return str(self.__dict__)

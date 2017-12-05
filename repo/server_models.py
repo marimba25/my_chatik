@@ -1,5 +1,5 @@
 import datetime
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Binary
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -78,3 +78,16 @@ class ClientHistory(Base):
 # Обратная связка для получения всех историй клиента Client.ClientHistories через свойство вместо запроса
 Client.ClientHistories = relationship("ClientHistory", order_by=ClientHistory.CreatedDatetime,
                                       back_populates="Client")
+
+class Avatar(Base):
+    """Avatar"""
+    # table name
+    __tablename__ = 'Avatar'
+    # primary key
+    ID = Column(Integer, primary_key=True)
+    ClientId = Column(Integer, ForeignKey('Client.ClientId'))
+    Avatar = Column(Binary)
+
+    def __init__(self, client_id, avatar_data):
+        self.ClientId = client_id
+        self.Avatar = avatar_data

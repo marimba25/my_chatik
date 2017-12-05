@@ -1,4 +1,4 @@
-from .server_models import Client, ClientHistory, ClientContact
+from .server_models import Client, ClientHistory, ClientContact, Avatar
 from .server_errors import NoneClientError
 from .repo import DbBaseRepo
 
@@ -45,6 +45,15 @@ class DbRepo(DbBaseRepo):
         else:
             raise NoneClientError(contact_username)
 
+    def add_avatar(self, client_username, avatar_data):
+        """Добавление аватара"""
+        client = self._get_client_by_username(client_username)
+        if client:
+            avatar = Avatar(client.ClientId, avatar_data)
+            self.session.add(avatar)
+        else:
+            raise NoneClientError(client_username)
+
     def del_contact(self, client_username, contact_username):
         """Удаление контакта"""
         contact = self._get_client_by_username(contact_username)
@@ -52,7 +61,8 @@ class DbRepo(DbBaseRepo):
             client = self._get_client_by_username(client_username)
             if client:
                 cc = self.session.query(ClientContact).filter(
-                    ClientContact.ClientId == client.ClientId).filter(ClientContact.ContactId == contact.ClientId).first()
+                    ClientContact.ClientId == client.ClientId).filter(
+                    ClientContact.ContactId == contact.ClientId).first()
                 self.session.delete(cc)
             else:
                 raise NoneClientError(contact_username)

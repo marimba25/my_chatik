@@ -26,20 +26,6 @@ class Contact(Base):
         return self.Name == other.Name
 
 
-# class Avatar(Base):
-#     """Avatar"""
-#     # table name
-#     __tablename__ = 'Avatar'
-#     # primary key
-#     ID = Column(Integer, primary_key=True)
-#     ContactId = Column(Integer, ForeignKey('Contact.ContactId'))
-#     Avatar = Column(Binary)
-#
-#     def __init__(self, contact_id, avatar_data):
-#         self.ContactId = contact_id
-#         self.Avatar = avatar_data
-#
-
 class MyAvatar(Base):
     """Avatar"""
     # table name

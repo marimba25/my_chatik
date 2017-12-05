@@ -3,9 +3,10 @@
 PRESENCE = 'presence'
 MSG = 'msg'
 QUIT = 'quit'
+ADD_AVATAR = 'add_avatar'
 
 # Кортеж возможных действий (будет дополняться)
-ACTIONS = (PRESENCE, MSG, QUIT)
+ACTIONS = (PRESENCE, MSG, QUIT, ADD_AVATAR)
 
 # Обязательные ключи в сообщениях от клиента
 ACTION = 'action'

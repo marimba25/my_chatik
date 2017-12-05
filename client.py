@@ -123,18 +123,27 @@ class Client:
             self.repo.del_contact(username)
             self.repo.commit()
 
+    def add_my_avatar(self, image_path):
+        with open(image_path, 'rb') as f:
+            avatar_data = f.read()
+
+        self.repo.add_my_avatar(avatar_data=avatar_data)
+        self.repo.commit()
+
+        print('before')
+        # формируем сообщение
+        add_avatar_message = JimMessage(action=ADD_AVATAR, time=time.time(), user=self.name,
+                                        avatar_data=JimMessage.bytes_to_base64str(avatar_data))
+        print('after')
+        # отправляем
+        self.socket.send(bytes(add_avatar_message))
+        print("after send")
+
+    def get_my_avatar(self):
+        return self.repo.get_my_avatar()
+
     def send_message(self, to, text):
         # формируем сообщение
         message = JimMessage(**{ACTION: MSG, TO: to, FROM: self.name, MESSAGE: text, TIME: time.time()})
         # отправляем
         self.socket.send(bytes(message))
-
-    def add_my_avatar(self, image_path):
-        with open(image_path, 'rb') as f:
-            avatar_data = f.read()
-            self.repo.add_my_avatar(avatar_data=avatar_data)
-            self.repo.commit()
-
-    def get_my_avatar(self):
-        return self.repo.get_my_avatar()
-

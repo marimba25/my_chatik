@@ -68,11 +68,11 @@ class Server:
         for sock in r_clients:
             try:
                 # Получаем входящие сообщения
-                bdata = sock.recv(1024)
+                bdata = sock.recv(2 ** 20)
                 jm = JimMessage.create_from_bytes(bdata)
                 # Добавляем в список пару сообщение и сокет который его прислал
                 messages.append((jm, sock))
-            except:
+            except InterruptedError:
                 print('Клиент {} {} отключился'.format(sock.fileno(), sock.getpeername()))
                 self._clients.remove(sock)
 
@@ -87,7 +87,6 @@ class Server:
 
         for message, sender in messages:
             # Теперь клиенты отправляют сообщения с разными ключами
-            print(message)
             if message.action == ADD_CONTACT:
                 # нужно добавить контакт клиенту
                 # имя клиента
@@ -138,6 +137,11 @@ class Server:
                 sock = self.names[to]
                 sock.send(bytes(message))
                 # отвечам тому кто прислал сообщение что все хорошо
+                sender.send(bytes(JimResponse(**{RESPONSE: ACCEPTED})))
+            elif message.action == ADD_AVATAR:
+                avatar_data = JimMessage.base64str_to_bytes(message.avatar_data)
+                self.repo.add_avatar(message.user, avatar_data)
+                self.repo.commit()
                 sender.send(bytes(JimResponse(**{RESPONSE: ACCEPTED})))
 
     def _get_connection(self):
