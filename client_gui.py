@@ -128,12 +128,26 @@ def set_avatar():
 window.pushButtonChangeAvatar.clicked.connect(set_avatar)
 
 
-def get_my_avatar():
-    gettin_avatar = client.get_my_avatar()
-    if not gettin_avatar:
+def load_avatar_from_local_db():
+    return client.get_my_avatar()
+
+
+def load_avatar_from_server():
+    return None
+
+
+def load_avatar():
+    avatar = load_avatar_from_server()
+    if avatar:
+        return avatar
+    return load_avatar_from_local_db()
+
+
+def draw_avatar_from_data(avatar):
+    if not avatar:
         return
     image = QImage()
-    image.loadFromData(gettin_avatar)
+    image.loadFromData(avatar)
     draw_avatar(image)
 
 
@@ -235,7 +249,7 @@ window.listWidgetContacts.setContextMenuPolicy(Qt.ActionsContextMenu)
 quitAction = QtWidgets.QAction("Quit", None)
 quitAction.triggered.connect(app.quit)
 window.listWidgetContacts.addAction(quitAction)
-get_my_avatar()
+draw_avatar_from_data(load_avatar())
 
 # рисуем окно
 window.show()
