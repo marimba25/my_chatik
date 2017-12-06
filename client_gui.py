@@ -133,7 +133,7 @@ def load_avatar_from_local_db():
 
 
 def load_avatar_from_server():
-    return None
+    return client.get_my_avatar_from_server()
 
 
 def load_avatar():

@@ -54,6 +54,17 @@ class DbRepo(DbBaseRepo):
         else:
             raise NoneClientError(client_username)
 
+    def get_avatar(self, client_username):
+        """Добавление аватара"""
+        client = self._get_client_by_username(client_username)
+        if client:
+            avatar_record = self.session.query(Avatar).filter(Avatar.ClientId == client.ClientId).order_by(
+                Avatar.ID.desc()).first()
+            if avatar_record:
+                return avatar_record.Avatar
+        else:
+            raise NoneClientError(client_username)
+
     def del_contact(self, client_username, contact_username):
         """Удаление контакта"""
         contact = self._get_client_by_username(contact_username)

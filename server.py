@@ -143,6 +143,18 @@ class Server:
                 self.repo.add_avatar(message.user, avatar_data)
                 self.repo.commit()
                 sender.send(bytes(JimResponse(**{RESPONSE: ACCEPTED})))
+            elif message.action == GET_AVATAR:
+                # отдаем список контактов клиенту
+                client_username = message.user
+                # получаем список контактов
+                avatar = self.repo.get_avatar(client_username)
+                # отправляем ответ что всё ок
+                response = JimResponse(**{RESPONSE: ACCEPTED})
+                # отправляем пока ответ всем
+                sender.send(bytes(response))
+                # формируем второе сообщение с аватаром
+                jm = JimMessage(action=JimMessage.bytes_to_base64str(avatar), time=time.time())
+                sender.send(bytes(jm))
 
     def _get_connection(self):
         try:

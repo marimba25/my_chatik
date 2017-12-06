@@ -142,6 +142,22 @@ class Client:
     def get_my_avatar(self):
         return self.repo.get_my_avatar()
 
+    def get_avatar_for_username(self, username):
+        """Получить аватар с сервера"""
+        # формируем сообщение
+        get_avatar_message = JimMessage(action=GET_AVATAR, time=time.time(), user=username)
+        # отправляем
+        self.socket.send(bytes(get_avatar_message))
+        # дальше слушатель получит ответ, который мы получим из очереди
+        jm = self.request_queue.get()
+        if jm.response == ACCEPTED:
+            # получаем следующее сообщение из очереди, там должен быть список контактов
+            jm = self.request_queue.get()
+            return JimMessage.base64str_to_bytes(jm.action)
+
+    def get_my_avatar_from_server(self):
+        return self.get_avatar_for_username(self.name)
+
     def send_message(self, to, text):
         # формируем сообщение
         message = JimMessage(**{ACTION: MSG, TO: to, FROM: self.name, MESSAGE: text, TIME: time.time()})
