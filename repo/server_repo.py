@@ -1,5 +1,5 @@
 from .server_models import Client, ClientHistory, ClientContact, Avatar
-from .server_errors import NoneClientError
+from .server_errors import NoneClientError, NoneAvatarError
 from .repo import DbBaseRepo
 
 
@@ -62,6 +62,8 @@ class DbRepo(DbBaseRepo):
                 Avatar.ID.desc()).first()
             if avatar_record:
                 return avatar_record.Avatar
+            else:
+                raise NoneAvatarError()
         else:
             raise NoneClientError(client_username)
 

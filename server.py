@@ -15,7 +15,7 @@ import log.server_log_config
 from log.decorators import Log
 from jim.config import *
 from jim.protocol import JimMessage, JimResponse
-from repo.server_errors import NoneClientError
+from repo.server_errors import NoneClientError, NoneAvatarError
 from repo.server_repo import DbRepo
 from repo.server_models import Base
 import time
@@ -147,14 +147,20 @@ class Server:
                 # отдаем список контактов клиенту
                 client_username = message.user
                 # получаем список контактов
-                avatar = self.repo.get_avatar(client_username)
-                # отправляем ответ что всё ок
-                response = JimResponse(**{RESPONSE: ACCEPTED})
-                # отправляем пока ответ всем
-                sender.send(bytes(response))
-                # формируем второе сообщение с аватаром
-                jm = JimMessage(action=JimMessage.bytes_to_base64str(avatar), time=time.time())
-                sender.send(bytes(jm))
+                try:
+                    avatar = self.repo.get_avatar(client_username)
+                except NoneAvatarError:
+                    # отправляем ответ что всё не ок
+                    response = JimResponse(**{RESPONSE: WRONG_REQUEST})
+                    sender.send(bytes(response))
+                else:
+                    response = JimResponse(**{RESPONSE: ACCEPTED})
+                    # отправляем пока ответ всем
+                    sender.send(bytes(response))
+                    # формируем второе сообщение с аватаром
+                    jm = JimMessage(action=JimMessage.bytes_to_base64str(avatar), time=time.time())
+                    sender.send(bytes(jm))
+
 
     def _get_connection(self):
         try:
