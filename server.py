@@ -66,14 +66,15 @@ class Server:
         messages = []
 
         for sock in r_clients:
-            try:
-                # Получаем входящие сообщения
-                bdata = sock.recv(2 ** 20)
+            # Получаем входящие сообщения
+            bdata = sock.recv(2 ** 20)
+            if bdata:
                 jm = JimMessage.create_from_bytes(bdata)
                 # Добавляем в список пару сообщение и сокет который его прислал
                 messages.append((jm, sock))
-            except InterruptedError:
-                print('Клиент {} {} отключился'.format(sock.fileno(), sock.getpeername()))
+            else:
+                print("Клиент отключился")
+                sock.close()
                 self._clients.remove(sock)
 
         # Возвращаем словарь сообщений
@@ -161,7 +162,6 @@ class Server:
                     jm = JimMessage(action=JimMessage.bytes_to_base64str(avatar), time=time.time())
                     sender.send(bytes(jm))
 
-
     def _get_connection(self):
         try:
             conn, addr = self.socket.accept()  # Проверка подключений
@@ -201,13 +201,7 @@ class Server:
         finally:
             # Проверить наличие событий ввода-вывода
             wait = 0
-            r = []
-            w = []
-            try:
-                r, w, e = select.select(self._clients, self._clients, [], wait)
-            except:
-                pass  # Ничего не делать, если какой-то клиент отключился
-
+            r, w, e = select.select(self._clients, self._clients, [], wait)
             requests = self._read_requests(r)  # Получаем входные сообщения
             self._write_responses(requests)  # Выполним отправку входящих сообщений
 
