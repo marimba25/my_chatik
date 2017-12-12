@@ -8,17 +8,17 @@
 - -a ​​<addr> ​-​ ​I​P-адрес ​​для ​​прослушивания ​(​по ​у​молчанию ​с​лушает ​​все ​​доступные ​​адреса).
 """
 import sys
+import time
+import logging
 from socket import socket, AF_INET, SOCK_STREAM
 import select
-import logging
-import log.server_log_config
+from log import server_log_config
 from log.decorators import Log
 from jim.config import *
 from jim.protocol import JimMessage, JimResponse
 from repo.server_errors import NoneClientError, NoneAvatarError
 from repo.server_repo import DbRepo
 from repo.server_models import Base
-import time
 
 # Получаем серверный логгер по имени, он уже объявлен в log_config и настроен
 logger = logging.getLogger('server')
