@@ -17,7 +17,6 @@ except ValueError:
     sys.exit(0)
 
 name = input("What is your name?") or 'Guest'
-print(name)
 
 
 client = Client(name, addr, port)

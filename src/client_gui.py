@@ -4,13 +4,23 @@ import threading
 from PyQt5.QtCore import Qt, QThread, pyqtSlot
 from client import Client
 from handlers import GuiReciever
-from PyQt5.QtWidgets import QMessageBox, QAction, QTextEdit, QFileDialog
+from PyQt5.QtWidgets import QMessageBox, QAction, QTextEdit, QFileDialog, QInputDialog, QPushButton, QLineEdit, QWidget
 from PyQt5.QtGui import QIcon, QFont, QTextCharFormat, QImage, QPixmap
 
-# я
-name = input("What is your name?")
 # Создаем приложение
 app = QtWidgets.QApplication(sys.argv)
+
+
+def get_name():
+    text, ok = QInputDialog.getText(None, 'Input name', 'What is your name')
+    if ok:
+        return text
+    else:
+        return 'Guest'
+
+
+name = get_name()
+
 # грузим главную форму
 window = uic.loadUi('main_win.ui')
 window.setWindowTitle(name)
@@ -26,8 +36,8 @@ listener = GuiReciever(client.socket, client.request_queue)
 # слот обновление данных в списке сообщений
 @pyqtSlot(str)
 def update_chat(data):
-    ''' Отображение сообщения в истории
-    '''
+    """Отображение сообщения в истории
+    """
     try:
         msg = data
         window.textEditMessage.insertHtml(msg + "<br>")

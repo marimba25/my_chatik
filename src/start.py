@@ -58,7 +58,7 @@ while True:
             client_name = 'Guest{}'.format(i)
             if system == 'Linux':
                 p_list.append(
-                    Popen(['xterm', '-hold', '-e', 'python3 {}'.format(CLIENT_GUI_PATH)],
+                    Popen(['python3', CLIENT_GUI_PATH],
                           shell=False))
             elif system == 'Windows':
                 Popen(['python3 {}'.format(CLIENT_GUI_PATH)],
