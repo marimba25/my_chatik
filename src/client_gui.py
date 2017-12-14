@@ -123,7 +123,7 @@ window.pushButtonHelp.clicked.connect(show_help)
 
 
 def draw_avatar(image):
-    pixmap = QPixmap.fromImage(image).scaled(120, 120)
+    pixmap = QPixmap.fromImage(image).scaled(140, 140)
     window.avatar.setPixmap(pixmap)
 
 
