@@ -20,6 +20,7 @@ from repo.server_errors import NoneClientError, NoneAvatarError
 from repo.server_repo import DbRepo
 from repo.server_models import Base
 
+
 # Получаем серверный логгер по имени, он уже объявлен в log_config и настроен
 logger = logging.getLogger('server')
 log = Log(logger)
@@ -85,6 +86,8 @@ class Server:
         """
         Теперь будем отправлять сообщения только конкретному пользователю
         """
+        print('messages in write_response')
+        print(messages)
 
         for message, sender in messages:
             # Теперь клиенты отправляют сообщения с разными ключами
@@ -104,7 +107,7 @@ class Server:
                     response = JimResponse(**{RESPONSE: WRONG_REQUEST})
                 finally:
                     # отправляем пока ответ всем
-                    sender.send(bytes(response))
+                    sender.sendall(bytes(response))
             elif message.action == DEL_CONTACT:
                 # нужно добавить контакт клиенту
                 # имя клиента
@@ -116,19 +119,21 @@ class Server:
                 self.repo.commit()
                 response = JimResponse(**{RESPONSE: OK})
                 # отправляем пока ответ всем
-                sender.send(bytes(response))
+                sender.sendall(bytes(response))
             elif message.action == GET_CONTACTS:
                 # отдаем список контактов клиенту
                 client_username = message.user
                 # получаем список контактов
+                print('before db get_contacts')
                 contact_list = self.repo.get_contacts(client_username)
+                print('after db')
                 # отправляем ответ что всё ок
                 response = JimResponse(**{RESPONSE: ACCEPTED, QUANTITY: len(contact_list)})
                 # отправляем пока ответ всем
-                sender.send(bytes(response))
+                sender.sendall(bytes(response))
                 # формируем второе сообщение со списком
                 jm = JimMessage(action=contact_list, time=time.time())
-                sender.send(bytes(jm))
+                sender.sendall(bytes(jm))
             elif message.action == MSG:
                 # получаем кому отправить сообщение
                 to = message.to
@@ -136,14 +141,14 @@ class Server:
                 # получаем сокет по имени
                 # можно даже обойти тут список контактов и отправлять напрямую
                 sock = self.names[to]
-                sock.send(bytes(message))
+                sock.sendall(bytes(message))
                 # отвечам тому кто прислал сообщение что все хорошо
-                sender.send(bytes(JimResponse(**{RESPONSE: ACCEPTED})))
+                sender.sendall(bytes(JimResponse(**{RESPONSE: ACCEPTED})))
             elif message.action == ADD_AVATAR:
                 avatar_data = JimMessage.base64str_to_bytes(message.avatar_data)
                 self.repo.add_avatar(message.user, avatar_data)
                 self.repo.commit()
-                sender.send(bytes(JimResponse(**{RESPONSE: ACCEPTED})))
+                sender.sendall(bytes(JimResponse(**{RESPONSE: ACCEPTED})))
             elif message.action == GET_AVATAR:
                 # отдаем список контактов клиенту
                 client_username = message.user
@@ -153,14 +158,14 @@ class Server:
                 except NoneAvatarError:
                     # отправляем ответ что всё не ок
                     response = JimResponse(**{RESPONSE: WRONG_REQUEST})
-                    sender.send(bytes(response))
+                    sender.sendall(bytes(response))
                 else:
                     response = JimResponse(**{RESPONSE: ACCEPTED})
                     # отправляем пока ответ всем
-                    sender.send(bytes(response))
+                    sender.sendall(bytes(response))
                     # формируем второе сообщение с аватаром
                     jm = JimMessage(action=JimMessage.bytes_to_base64str(avatar), time=time.time())
-                    sender.send(bytes(jm))
+                    sender.sendall(bytes(jm))
 
     def _get_connection(self):
         try:
@@ -185,11 +190,12 @@ class Server:
                 self.repo.commit()
                 # отправляем ответ
                 presence_response = JimResponse(**{RESPONSE: OK})
-                conn.send(bytes(presence_response))
+                conn.sendall(bytes(presence_response))
             else:
                 presence_response = JimResponse(**{RESPONSE: WRONG_REQUEST})
-                conn.send(bytes(presence_response))
+                conn.sendall(bytes(presence_response))
         except OSError as e:
+            print('OSError')
             pass  # timeout вышел
         else:
             print("Получен запрос на соединение от %s" % str(addr))
@@ -201,9 +207,13 @@ class Server:
         finally:
             # Проверить наличие событий ввода-вывода
             wait = 0
-            r, w, e = select.select(self._clients, self._clients, [], wait)
-            requests = self._read_requests(r)  # Получаем входные сообщения
-            self._write_responses(requests)  # Выполним отправку входящих сообщений
+            print(time.time(), self._clients)
+            try:
+                r, w, e = select.select(self._clients, self._clients, [], wait)
+                requests = self._read_requests(r)  # Получаем входные сообщения
+                self._write_responses(requests)  # Выполним отправку входящих сообщений
+            except:
+                pass
 
     def main_loop(self):
         """
@@ -231,3 +241,6 @@ if __name__ == '__main__':
 
     serv = Server(addr, port)
     serv.main_loop()
+
+
+    

@@ -25,12 +25,15 @@ name = get_name()
 window = uic.loadUi('main_win.ui')
 window.setWindowTitle(name)
 # создаем клиента на запись
+print('before Client')
 client = Client(name=name)
+print('after Client')
 # получаем список контактов с сервера, которые лежат у нас - не надежные
 client.connect()
+print('after connect')
 
 listener = GuiReciever(client.socket, client.request_queue)
-
+print('after listener')
 
 # Связываем сигнал и слот
 # слот обновление данных в списке сообщений
@@ -44,9 +47,15 @@ def update_chat(data):
     except Exception as e:
         print(e)
 
+@pyqtSlot(int)
+def listener_finished(data):
+    print('listener_finished')
+    client.disconnect()
 
 # сигнал мы берем из нашего GuiReciever
 listener.gotData.connect(update_chat)
+
+listener.finished.connect(listener_finished)
 
 # Используем QThread так рекомендуется, но можно и обычный
 # th_listen = threading.Thread(target=listener.poll)
@@ -60,7 +69,12 @@ listener.moveToThread(th)
 th.started.connect(listener.poll)
 th.start()
 
+print('after QThread start')
+
+
 contact_list = client.get_contacts()
+
+print('after get contact list')
 
 
 def load_contacts(contacts):
@@ -123,7 +137,7 @@ window.pushButtonHelp.clicked.connect(show_help)
 
 
 def draw_avatar(image):
-    pixmap = QPixmap.fromImage(image).scaled(140, 140)
+    pixmap = QPixmap.fromImage(image).scaled(140, 140, Qt.KeepAspectRatio)
     window.avatar.setPixmap(pixmap)
 
 

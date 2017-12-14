@@ -1,6 +1,6 @@
 # Служебный скрипт запуска/останова нескольких клиентских приложений
 
-from subprocess import Popen
+from subprocess import Popen, TimeoutExpired
 import time
 import random
 from client import Client
@@ -32,7 +32,7 @@ while True:
             p_list.append(Popen(['xterm', '-hold', '-e', 'python3 {}'.format(SERVER_PATH)],
                                 shell=False))
         elif system == 'Windows':
-            p_list.append(Popen(['python3 {}'.format(SERVER_PATH)],
+            p_list.append(Popen('python {}'.format(SERVER_PATH),
                                 creationflags=CREATE_NEW_CONSOLE))
         print('Сервер запущен')
         # ждем на всякий пожарный
@@ -46,7 +46,7 @@ while True:
                 p_list.append(Popen(['xterm', '-hold', '-e', 'python3 {} localhost 7777'.format(CLIENT_PATH)],
                                     shell=False))
             elif system == 'Windows':
-                p_list.append(Popen(['python3 {} localhost 7777'.format(CLIENT_PATH)],
+                p_list.append(Popen('python {} localhost 7777'.format(CLIENT_PATH),
                                     creationflags=CREATE_NEW_CONSOLE))
 
         # запускаем гуи клиентов
@@ -61,15 +61,19 @@ while True:
                     Popen(['python3', CLIENT_GUI_PATH],
                           shell=False))
             elif system == 'Windows':
-                Popen(['python3 {}'.format(CLIENT_GUI_PATH)],
+                Popen('python {}'.format(CLIENT_GUI_PATH),
                       creationflags=CREATE_NEW_CONSOLE)
         print('Клиенты запущены')
 
     elif user == 'q':
         print('Открыто процессов {}'.format(len(p_list)))
         for p in p_list:
-            print('Закрываю {}'.format(p))
-            p.kill()
+            try:
+                print('Закрываю {}'.format(p))
+                p.wait(0.5)
+            except TimeoutExpired:
+                print('Убиваю {}'.format(p))
+                p.kill()
         p_list.clear()
         print('Выхожу')
         break

@@ -58,7 +58,9 @@ class Client:
         # Сохраняем сокет
         self.socket = s
         # При соединении сразу отправляем сообщение о присутствии
+        print('before send presense')
         self.send_presence()
+        print('after send presense')
 
     def disconnect(self):
         # Отключаемся
@@ -68,7 +70,7 @@ class Client:
         """Отправить сообщение о присутствии"""
         presence_msg = JimMessage(action=PRESENCE, time=time.time(), user={ACCOUNT_NAME: self.name})
         # переводим в байты и отправляем
-        self.socket.send(bytes(presence_msg))
+        self.socket.sendall(bytes(presence_msg))
 
         # получаем ответ в байтах
         presence_response_bytes = self.socket.recv(1024)
@@ -81,9 +83,12 @@ class Client:
         # формируем сообщение
         list_message = JimMessage(action=GET_CONTACTS, time=time.time(), user=self.name)
         # отправляем
-        self.socket.send(bytes(list_message))
+        print('before send get contacts')
+        self.socket.sendall(bytes(list_message))
+        print('after send')
         # дальше слушатель получит ответ, который мы получим из очереди
         jm = self.request_queue.get()
+        print('after request get')
         if jm.response == ACCEPTED:
             # получаем следующее сообщение из очереди, там должен быть список контактов
             jm = self.request_queue.get()
@@ -99,7 +104,7 @@ class Client:
         # формируем сообщение на добавления контакта
         add_message = JimMessage(action=ADD_CONTACT, user_id=username, time=time.time(), user=self.name)
         # отправляем сообщение на сервер
-        self.socket.send(bytes(add_message))
+        self.socket.sendall(bytes(add_message))
         # получаем ответ от сервера
         # ответ получает слушатель, мы его получаем через очередь
         jm = self.request_queue.get()
@@ -112,7 +117,7 @@ class Client:
         # формируем сообщение на добавления контакта
         message = JimMessage(action=DEL_CONTACT, user_id=username, time=time.time(), user=self.name)
         # отправляем сообщение на сервер
-        self.socket.send(bytes(message))
+        self.socket.sendall(bytes(message))
         # получаем ответ от сервера
         # получаем ответ из очереди
         # Формируем сообщение из байт
@@ -136,7 +141,7 @@ class Client:
                                         avatar_data=JimMessage.bytes_to_base64str(avatar_data))
         print('after')
         # отправляем
-        self.socket.send(bytes(add_avatar_message))
+        self.socket.sendall(bytes(add_avatar_message))
         print("after send")
 
     def get_my_avatar(self):
@@ -147,7 +152,7 @@ class Client:
         # формируем сообщение
         get_avatar_message = JimMessage(action=GET_AVATAR, time=time.time(), user=username)
         # отправляем
-        self.socket.send(bytes(get_avatar_message))
+        self.socket.sendall(bytes(get_avatar_message))
         # дальше слушатель получит ответ, который мы получим из очереди
         jm = self.request_queue.get()
         if jm.response == ACCEPTED:
@@ -162,4 +167,4 @@ class Client:
         # формируем сообщение
         message = JimMessage(**{ACTION: MSG, TO: to, FROM: self.name, MESSAGE: text, TIME: time.time()})
         # отправляем
-        self.socket.send(bytes(message))
+        self.socket.sendall(bytes(message))

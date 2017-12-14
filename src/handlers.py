@@ -23,7 +23,10 @@ class Receiver:
         while True:
             if not self.is_alive:
                 break
+            print('before recv')
             data = self.sock.recv(2**20)
+            print('after recv')
+            print(data)
             if data:
                 try:
                     # Если нам пришло сообщение
