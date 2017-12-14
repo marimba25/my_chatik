@@ -1,7 +1,7 @@
 import sys
 from PyQt5 import QtWidgets, uic
 import threading
-from PyQt5.QtCore import Qt, QThread, pyqtSlot
+from PyQt5.QtCore import Qt, QThread, pyqtSlot, QBuffer, QIODevice
 from client import Client
 from handlers import GuiReciever
 from PyQt5.QtWidgets import QMessageBox, QAction, QTextEdit, QFileDialog, QInputDialog, QPushButton, QLineEdit, QWidget
@@ -144,8 +144,11 @@ def draw_avatar(image):
 def set_avatar():
     """установка аватарки"""
     image_path = QFileDialog.getOpenFileName(window, 'Choose file', '', 'Images (*.jpg)')[0]
-    client.add_my_avatar(image_path)
-    image = QImage(image_path)
+    image = QImage(image_path).scaled(256, 256, Qt.KeepAspectRatio)
+    buffer = QBuffer()
+    buffer.open(QIODevice.ReadWrite)
+    image.save(buffer, 'JPG')
+    client.add_my_avatar(buffer.data())
     draw_avatar(image)
 
 

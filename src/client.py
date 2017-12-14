@@ -128,10 +128,7 @@ class Client:
             self.repo.del_contact(username)
             self.repo.commit()
 
-    def add_my_avatar(self, image_path):
-        with open(image_path, 'rb') as f:
-            avatar_data = f.read()
-
+    def add_my_avatar(self, avatar_data):
         self.repo.add_my_avatar(avatar_data=avatar_data)
         self.repo.commit()
 
