@@ -1,24 +1,24 @@
 # my_chatik
 just a chat
 
-Установка
+How to install
 =========
-Установите с помощью pip3 install my_chatik
+Install with "pip3 install my_chatik"
 
-Требования
+Requirements
 ==========
 python3, sqlalchemy
 
-Что сделано
+Done
 ============
-1. Форматирование текста в сообщении и доставка его в форматированном виде клиенту.
-2. Сохранение аватарок в БД клиента и БД сервера. При повторном открытии приложения аватарки загружаются с сервера.
-3. Масштабирование аватарок (в том числе и больших размеров)
-4. Исправлена ошибка "падения сервера" при закрытии клиента.
-5. И другие важные штуки
+1. Format the text in the message and deliver it in a formatted format to the client.
+2. Saving of avatars in the client database and server database. When you re-open the application, the avatars are downloaded     from the server.
+3. Scaling avatars (including large ones)
+4. Fixed a "server crash" error when closing a client.
+5. Other important things
 
-Что важно исправить
+What I want to fix first
 ===================
 
-1. Какая-то беда с тредами.
-2. Если юзер оффлайн, то сообщение ему не доставится
+1. Somrthing wrong witj threads.
+2. If the user is offline, the message will not reach him
