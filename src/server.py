@@ -86,8 +86,6 @@ class Server:
         """
         Теперь будем отправлять сообщения только конкретному пользователю
         """
-        print('messages in write_response')
-        print(messages)
 
         for message, sender in messages:
             # Теперь клиенты отправляют сообщения с разными ключами
@@ -124,9 +122,7 @@ class Server:
                 # отдаем список контактов клиенту
                 client_username = message.user
                 # получаем список контактов
-                print('before db get_contacts')
                 contact_list = self.repo.get_contacts(client_username)
-                print('after db')
                 # отправляем ответ что всё ок
                 response = JimResponse(**{RESPONSE: ACCEPTED, QUANTITY: len(contact_list)})
                 # отправляем пока ответ всем
@@ -178,7 +174,6 @@ class Server:
                 client_name = presence_msg.user[ACCOUNT_NAME]
                 print('К нам подключился {}'.format(client_name))
                 # если клиента нету в базе
-                print(self.repo.client_exists(client_name))
                 if not self.repo.client_exists(client_name):
                     # мы его добавляем
                     print('Добавляем клиента')
@@ -195,7 +190,6 @@ class Server:
                 presence_response = JimResponse(**{RESPONSE: WRONG_REQUEST})
                 conn.sendall(bytes(presence_response))
         except OSError as e:
-            print('OSError')
             pass  # timeout вышел
         else:
             print("Получен запрос на соединение от %s" % str(addr))
@@ -207,7 +201,6 @@ class Server:
         finally:
             # Проверить наличие событий ввода-вывода
             wait = 0
-            print(time.time(), self._clients)
             try:
                 r, w, e = select.select(self._clients, self._clients, [], wait)
                 requests = self._read_requests(r)  # Получаем входные сообщения

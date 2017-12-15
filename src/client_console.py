@@ -17,7 +17,7 @@ except ValueError:
     sys.exit(0)
 
 name = input("What is your name?") or 'Guest'
-print(name)
+
 
 
 client = Client(name, addr, port)
@@ -51,7 +51,6 @@ while True:
             client.del_contact(username)
     elif message_str == 'list':
         contacts = client.get_contacts()
-        print(contacts)
     elif message_str.startswith('message'):
         params = message_str.split()
         try:

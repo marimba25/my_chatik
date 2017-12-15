@@ -58,9 +58,7 @@ class Client:
         # Сохраняем сокет
         self.socket = s
         # При соединении сразу отправляем сообщение о присутствии
-        print('before send presense')
         self.send_presence()
-        print('after send presense')
 
     def disconnect(self):
         # Отключаемся
@@ -83,12 +81,9 @@ class Client:
         # формируем сообщение
         list_message = JimMessage(action=GET_CONTACTS, time=time.time(), user=self.name)
         # отправляем
-        print('before send get contacts')
         self.socket.sendall(bytes(list_message))
-        print('after send')
         # дальше слушатель получит ответ, который мы получим из очереди
         jm = self.request_queue.get()
-        print('after request get')
         if jm.response == ACCEPTED:
             # получаем следующее сообщение из очереди, там должен быть список контактов
             jm = self.request_queue.get()
@@ -132,14 +127,13 @@ class Client:
         self.repo.add_my_avatar(avatar_data=avatar_data)
         self.repo.commit()
 
-        print('before')
         # формируем сообщение
         add_avatar_message = JimMessage(action=ADD_AVATAR, time=time.time(), user=self.name,
                                         avatar_data=JimMessage.bytes_to_base64str(avatar_data))
-        print('after')
+
         # отправляем
         self.socket.sendall(bytes(add_avatar_message))
-        print("after send")
+
 
     def get_my_avatar(self):
         return self.repo.get_my_avatar()
