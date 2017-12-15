@@ -3,7 +3,7 @@ just a chat
 
 How to install
 =========
-Install with "pip3 install my_chatik"
+Install with "pip3 install my_chatik". Files will be stored in directory "src".
 
 Requirements
 ==========
