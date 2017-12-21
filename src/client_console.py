@@ -1,6 +1,6 @@
 import sys
-from client import Client
-from handlers import ConsoleReciever
+from src.client import Client
+from src.handlers import ConsoleReciever
 import threading
 
 # Получаем параметры скрипта

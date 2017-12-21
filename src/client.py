@@ -12,16 +12,16 @@ import sys
 import logging
 import time
 from socket import socket, AF_INET, SOCK_STREAM
-import log.client_log_config
-from log.decorators import Log
-from jim.protocol import JimMessage, JimResponse
-from jim.config import *
-from client_errors import WrongModeError
-from repo.client_repo import DbRepo
-from repo.client_models import Base
+import src.log.client_log_config
+from src.log.decorators import Log
+from src.jim.protocol import JimMessage, JimResponse
+from src.jim.config import *
+from src.client_errors import WrongModeError
+from src.repo.client_repo import DbRepo
+from src.repo.client_models import Base
 import threading
 from queue import Queue
-from jim.errors import MandatoryKeyError
+from src.jim.errors import MandatoryKeyError
 
 # Получаем по имени клиентский логгер, он уже нестроен в log_config
 logger = logging.getLogger('client')
