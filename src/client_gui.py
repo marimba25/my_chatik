@@ -1,4 +1,6 @@
 import sys
+from functools import partial
+
 from PyQt5 import QtWidgets, uic
 import threading
 from PyQt5.QtCore import Qt, QThread, pyqtSlot, QBuffer, QIODevice
@@ -6,7 +8,23 @@ from src.client import Client
 from src.handlers import GuiReciever
 from PyQt5.QtWidgets import QMessageBox, QAction, QTextEdit, QFileDialog, QInputDialog, QPushButton, QLineEdit, QWidget
 from PyQt5.QtGui import QIcon, QFont, QTextCharFormat, QImage, QPixmap
-import os
+
+
+SMILES_DIR = 'icons/smiles/'
+SMILES = (('angel.png', 'Angel'),
+          ('boring.png', 'Boring'),
+          ('cool.png', 'Cool'),
+          ('cry.png', 'Cry'),
+          ('happy.png', 'Happy'),
+          ('inlove.png', 'Inlove'),
+          ('insane.png', 'Insane'),
+          ('kiss.png', 'Kiss'),
+          ('laugh.png', 'Laugh'),
+          ('netral.png', 'Netral'),
+          ('question.png', 'Question'),
+          ('sad.png', 'Sad'),
+          ('smart.png', 'Smart'),
+          ('surprise.png', 'Surprise'))
 
 # Создаем приложение
 app = QtWidgets.QApplication(sys.argv)
@@ -32,6 +50,7 @@ client.connect()
 
 listener = GuiReciever(client.socket, client.request_queue)
 
+
 # Связываем сигнал и слот
 # слот обновление данных в списке сообщений
 
@@ -51,6 +70,7 @@ def update_chat(data):
 def listener_finished(data):
     client.disconnect()
 
+
 # сигнал мы берем из нашего GuiReciever
 listener.gotData.connect(update_chat)
 
@@ -67,7 +87,6 @@ listener.moveToThread(th)
 # При запуске потока будет вызван метод search_text
 th.started.connect(listener.poll)
 th.start()
-
 
 contact_list = client.get_contacts()
 
@@ -214,52 +233,18 @@ def open_chat():
         italic.triggered.connect(action_italic)
         underlined.triggered.connect(action_underlined)
 
-        def smile_action():
-            root, dirs, files = os.walk('icons/smiles')
-            print(root, dirs, files)
-            for file in [file for file in files]:
-                url = os.path.join(root, file)
-                chatik.textEdit.insertHtml('<img src="%s" />' % url)
-
-        smiles = []
-        root, dirs, files = os.walk('icons/smiles')
-        for smile in os.path.join(root, files):
-            QAction(QIcon(smile), chatik)
-            smiles.append(smile)
-
         toolbar = chatik.addToolBar('Smiles')
-        for smile in smiles:
-            toolbar.addAction(smile)
 
-        for smile in smiles:
-            smile.triggered.connect(smile_action())
+        def smile_slot(path, chatik):
+            chatik.textEdit.insertHtml('<img src="%s" />' % path)
 
-
-
-        # def action_smile():
-        #     url = 'icons/smile.png'
-        #     chatik.textEdit.insertHtml('<img src="%s" />' % url)
-        #
-        # def action_sad():
-        #     url = 'icons/sad.png'
-        #     chatik.textEdit.insertHtml('<img src="%s" />' % url)
-        #
-        # def action_scared():
-        #     url = 'icons/scared.png'
-        #     chatik.textEdit.insertHtml('<img src="%s" />' % url)
-
-        # smile = QAction(QIcon('icons/smile.png'), 'Smile', chatik)
-        # sad = QAction(QIcon('icons/sad.png'), 'Sad', chatik)
-        # scared = QAction(QIcon('icons/scared'), 'Scared', chatik)
-
-        # toolbar = chatik.addToolBar('Smiles')
-        # toolbar.addAction(smile)
-        # toolbar.addAction(sad)
-        # toolbar.addAction(scared)
-
-        # smile.triggered.connect(action_smile)
-        # sad.triggered.connect(action_sad)
-        # scared.triggered.connect(action_scared)
+        for file, title in SMILES:
+            path = SMILES_DIR + file
+            icon = QIcon(path)
+            action = QAction(icon, title, chatik)
+            slot = partial(smile_slot, path, chatik)
+            action.triggered.connect(slot)
+            toolbar.addAction(action)
 
         # отправка сообщения
         def send_message():
