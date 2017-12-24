@@ -6,7 +6,8 @@ import threading
 from PyQt5.QtCore import Qt, QThread, pyqtSlot, QBuffer, QIODevice
 from src.client import Client
 from src.handlers import GuiReciever
-from PyQt5.QtWidgets import QMessageBox, QAction, QTextEdit, QFileDialog, QInputDialog, QPushButton, QLineEdit, QWidget
+from PyQt5.QtWidgets import QMessageBox, QAction, QTextEdit, QFileDialog, QInputDialog, QPushButton, QLineEdit, QWidget, \
+    QToolButton, QMenu
 from PyQt5.QtGui import QIcon, QFont, QTextCharFormat, QImage, QPixmap
 
 
@@ -238,13 +239,29 @@ def open_chat():
         def smile_slot(path, chatik):
             chatik.textEdit.insertHtml('<img src="%s" />' % path)
 
+        # for file, title in SMILES:
+        #     path = SMILES_DIR + file
+        #     icon = QIcon(path)
+        #     action = QAction(icon, title, chatik)
+        #     slot = partial(smile_slot, path, chatik)
+        #     action.triggered.connect(slot)
+        #     toolbar.addAction(action)
+
+        smile_select_button = QToolButton(chatik)
+        smile_select_button.setText(':-)')
+        smile_select_button.setPopupMode(QToolButton.InstantPopup)
+        smiles_menu = QMenu(smile_select_button)
+
         for file, title in SMILES:
             path = SMILES_DIR + file
             icon = QIcon(path)
-            action = QAction(icon, title, chatik)
+            action = QAction(icon, '', chatik)
             slot = partial(smile_slot, path, chatik)
             action.triggered.connect(slot)
-            toolbar.addAction(action)
+            smiles_menu.addAction(action)
+
+        smile_select_button.setMenu(smiles_menu)
+        toolbar.addWidget(smile_select_button)
 
         # отправка сообщения
         def send_message():
