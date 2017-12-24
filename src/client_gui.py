@@ -230,19 +230,23 @@ def add_smiles_toolbar(chatik):
     button.setText(':-)')
     button.setPopupMode(QToolButton.InstantPopup)
     menu = QMenu(button)
-    menu_toolbar = QToolBar(menu)
 
-    for file, title in SMILES:
-        path = SMILES_DIR + file
-        icon = QIcon(path)
-        action = QAction(icon, '', chatik)
-        slot = partial(smile_slot, path)
-        action.triggered.connect(slot)
-        menu_toolbar.addAction(action)
+    chunks = [SMILES[x:x + 4] for x in range(0, len(SMILES), 4)]
 
-    widget_action = QWidgetAction(menu)
-    widget_action.setDefaultWidget(menu_toolbar)
-    menu.addAction(widget_action)
+    for chunk in chunks:
+        menu_toolbar = QToolBar(menu)
+        widget_action = QWidgetAction(menu)
+        widget_action.setDefaultWidget(menu_toolbar)
+        menu.addAction(widget_action)
+
+        for file, title in chunk:
+            path = SMILES_DIR + file
+            icon = QIcon(path)
+            action = QAction(icon, '', chatik)
+            slot = partial(smile_slot, path)
+            action.triggered.connect(slot)
+            menu_toolbar.addAction(action)
+
     button.setMenu(menu)
     chatik.addToolBar('Smiles').addWidget(button)
 
