@@ -7,9 +7,8 @@ from PyQt5.QtCore import Qt, QThread, pyqtSlot, QBuffer, QIODevice
 from src.client import Client
 from src.handlers import GuiReciever
 from PyQt5.QtWidgets import QMessageBox, QAction, QTextEdit, QFileDialog, QInputDialog, QPushButton, QLineEdit, QWidget, \
-    QToolButton, QMenu
+    QToolButton, QMenu, QGridLayout, QToolBar, QWidgetAction
 from PyQt5.QtGui import QIcon, QFont, QTextCharFormat, QImage, QPixmap
-
 
 SMILES_DIR = 'icons/smiles/'
 SMILES = (('angel.png', 'Angel'),
@@ -193,11 +192,69 @@ def draw_avatar_from_data(avatar):
     draw_avatar(image)
 
 
+def add_font_toolbar(chatik):
+    def action_bold():
+        my_font = QTextCharFormat()
+        my_font.setFontWeight(QFont.Bold)
+        chatik.textEdit.mergeCurrentCharFormat(my_font)
+
+    def action_italic():
+        my_font = QTextCharFormat()
+        my_font.setFontItalic(True)
+        chatik.textEdit.mergeCurrentCharFormat(my_font)
+
+    def action_underlined():
+        my_font = QTextCharFormat()
+        my_font.setFontUnderline(True)
+        chatik.textEdit.mergeCurrentCharFormat(my_font)
+
+    bold = QAction(QIcon('icons/b.jpg'), 'Bold', chatik)
+    italic = QAction(QIcon('icons/i.jpg'), 'Italic', chatik)
+    underlined = QAction(QIcon('icons/u.jpg'), 'Underlined', chatik)
+
+    toolbar = chatik.addToolBar('Formatting')
+    toolbar.addAction(bold)
+    toolbar.addAction(italic)
+    toolbar.addAction(underlined)
+
+    bold.triggered.connect(action_bold)
+    italic.triggered.connect(action_italic)
+    underlined.triggered.connect(action_underlined)
+
+
+def add_smiles_toolbar(chatik):
+    def smile_slot(img_path):
+        chatik.textEdit.insertHtml('<img src="%s" />' % img_path)
+
+    button = QToolButton(chatik)
+    button.setText(':-)')
+    button.setPopupMode(QToolButton.InstantPopup)
+    menu = QMenu(button)
+    menu_toolbar = QToolBar(menu)
+
+    for file, title in SMILES:
+        path = SMILES_DIR + file
+        icon = QIcon(path)
+        action = QAction(icon, '', chatik)
+        slot = partial(smile_slot, path)
+        action.triggered.connect(slot)
+        menu_toolbar.addAction(action)
+
+    widget_action = QWidgetAction(menu)
+    widget_action.setDefaultWidget(menu_toolbar)
+    menu.addAction(widget_action)
+    button.setMenu(menu)
+    chatik.addToolBar('Smiles').addWidget(button)
+
+
 def open_chat():
     try:
         """Открытие чата"""
         # грузим QDialog чата
         chatik = uic.loadUi('chatik_window.ui')
+
+        add_font_toolbar(chatik)
+        add_smiles_toolbar(chatik)
 
         # получаем выделенного пользователя
         selected_index = window.listWidgetContacts.currentIndex()
@@ -205,63 +262,6 @@ def open_chat():
         user_name = selected_index.data()
         # выставляем имя в название окна
         chatik.setWindowTitle(user_name)
-
-        def action_bold():
-            my_font = QTextCharFormat()
-            my_font.setFontWeight(QFont.Bold)
-            chatik.textEdit.mergeCurrentCharFormat(my_font)
-
-        def action_italic():
-            my_font = QTextCharFormat()
-            my_font.setFontItalic(True)
-            chatik.textEdit.mergeCurrentCharFormat(my_font)
-
-        def action_underlined():
-            my_font = QTextCharFormat()
-            my_font.setFontUnderline(True)
-            chatik.textEdit.mergeCurrentCharFormat(my_font)
-
-        bold = QAction(QIcon('icons/b.jpg'), 'Bold', chatik)
-        italic = QAction(QIcon('icons/i.jpg'), 'Italic', chatik)
-        underlined = QAction(QIcon('icons/u.jpg'), 'Underlined', chatik)
-
-        toolbar = chatik.addToolBar('Formatting')
-        toolbar.addAction(bold)
-        toolbar.addAction(italic)
-        toolbar.addAction(underlined)
-
-        bold.triggered.connect(action_bold)
-        italic.triggered.connect(action_italic)
-        underlined.triggered.connect(action_underlined)
-
-        toolbar = chatik.addToolBar('Smiles')
-
-        def smile_slot(path, chatik):
-            chatik.textEdit.insertHtml('<img src="%s" />' % path)
-
-        # for file, title in SMILES:
-        #     path = SMILES_DIR + file
-        #     icon = QIcon(path)
-        #     action = QAction(icon, title, chatik)
-        #     slot = partial(smile_slot, path, chatik)
-        #     action.triggered.connect(slot)
-        #     toolbar.addAction(action)
-
-        smile_select_button = QToolButton(chatik)
-        smile_select_button.setText(':-)')
-        smile_select_button.setPopupMode(QToolButton.InstantPopup)
-        smiles_menu = QMenu(smile_select_button)
-
-        for file, title in SMILES:
-            path = SMILES_DIR + file
-            icon = QIcon(path)
-            action = QAction(icon, '', chatik)
-            slot = partial(smile_slot, path, chatik)
-            action.triggered.connect(slot)
-            smiles_menu.addAction(action)
-
-        smile_select_button.setMenu(smiles_menu)
-        toolbar.addWidget(smile_select_button)
 
         # отправка сообщения
         def send_message():
